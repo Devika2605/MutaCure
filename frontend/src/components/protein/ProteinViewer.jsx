@@ -33,7 +33,8 @@ export default function ProteinViewer({ mutationData }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           target_protein: selectedDisease.target,
-          max_length: 100,
+          max_length: 200,
+          apply_mutation: true,
         }),
       });
 
@@ -54,13 +55,19 @@ export default function ProteinViewer({ mutationData }) {
   }, [selectedDisease]);
 
   useEffect(() => {
-    if (phase !== "done" || !result?.pdb_url || !molRef.current) return;
-
-    const pdbUrl = `${API_BASE}${result.pdb_url}`;
-    const iframe = molRef.current;
-    iframe.src = `https://molstar.org/viewer/?pdb-url=${encodeURIComponent(pdbUrl)}&hide-controls=1`;
-  }, [phase, result]);
-
+  if (phase !== "done" || !result?.pdb_url || !molRef.current) return;
+ 
+  const pdbUrl = `${API_BASE}${result.pdb_url}`;
+  
+  // Pass mutation position (1-based) and info to viewer
+  const mutPos = result.mutated_positions?.[0] != null 
+    ? result.mutated_positions[0] + 1  // convert 0-based to 1-based
+    : 0;
+  const mutInfo = encodeURIComponent(result.mutation_info || "");
+ 
+  molRef.current.src = `/ar/viewer.html?pdb=${encodeURIComponent(pdbUrl)}&mut=${mutPos}&info=${mutInfo}`;
+}, [phase, result]);
+ 
   const affinityScore = result ? (-7.2 - Math.random() * 3).toFixed(1) : null;
 
   return (
@@ -289,7 +296,7 @@ export default function ProteinViewer({ mutationData }) {
                 <p className={styles.arCtaSub}>Scan a marker to visualize this protein in your real world</p>
               </div>
             </div>
-            <a href="/ar" className={styles.arBtn}>Launch AR →</a>
+            <a href="/ar/index.html" className={styles.arBtn}>Launch AR →</a>
           </div>
         </div>
       </div>
