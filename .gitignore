@@ -38,3 +38,9 @@ Thumbs.db
 *.log
 
 backend/models/*.pkl
+
+.env
+*.env
+
+.env
+backend/.env
