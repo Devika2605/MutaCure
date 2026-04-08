@@ -35,7 +35,7 @@ export default function ProteinViewer({ mutationData }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          target_protein: target.target,
+          target_protein: selectedDisease.target,
           max_length: 100,
         }),
       });
@@ -76,53 +76,14 @@ export default function ProteinViewer({ mutationData }) {
 
   // ─── FIX 2: Load PDB into 3Dmol.js when generation is done ───────────────
   useEffect(() => {
-    if (phase !== "done" || !result?.pdb_url || !viewerRef.current) return;
-    if (typeof window === "undefined" || !window.$3Dmol) return;
+    if (phase !== "done" || !result?.pdb_url || !molRef.current) return;
 
     const pdbUrl = `${API_BASE}${result.pdb_url}`;
-
-    // destroy previous viewer if exists
-    if (viewer3d.current) {
-      try { viewer3d.current.clear(); } catch (_) {}
-    }
-
-    // fetch PDB text and load into 3Dmol
-    fetch(pdbUrl)
-      .then((r) => {
-        if (!r.ok) throw new Error("PDB fetch failed");
-        return r.text();
-      })
-      .then((pdbText) => {
-        const viewer = window.$3Dmol.createViewer(viewerRef.current, {
-          backgroundColor: "#0a140b",
-        });
-        viewer.addModel(pdbText, "pdb");
-        viewer.setStyle(
-          {},
-          {
-            cartoon: {
-              colorscheme: {
-                prop: "b",
-                gradient: "roygb",
-                min: 50,
-                max: 90,
-              },
-            },
-          }
-        );
-        viewer.zoomTo();
-        viewer.render();
-        viewer.zoom(1.1, 800);
-        viewer3d.current = viewer;
-      })
-      .catch(() => {
-        addLog("⚠ Could not render 3D structure — check backend /files/ route");
-      });
+    const iframe = molRef.current;
+    iframe.src = `https://molstar.org/viewer/?pdb-url=${encodeURIComponent(pdbUrl)}&hide-controls=1`;
   }, [phase, result]);
 
-  const affinityScore = result
-    ? (-7.2 - Math.random() * 3).toFixed(1)
-    : null;
+  const affinityScore = result ? (-7.2 - Math.random() * 3).toFixed(1) : null;
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
@@ -406,7 +367,7 @@ export default function ProteinViewer({ mutationData }) {
                 </p>
               </div>
             </div>
-            <a href="/ar" className={styles.arBtn}>Launch AR →</a>
+            <a href="/ar/index.html" className={styles.arBtn}>Launch AR →</a>
           </div>
         </div>
       </div>
