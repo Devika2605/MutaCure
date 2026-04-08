@@ -2,6 +2,7 @@
 // Person 2's route — /protein
 import Head from "next/head";
 import ProteinViewer from "../components/protein/ProteinViewer";
+<script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js" />
 
 export default function ProteinPage() {
   return (
