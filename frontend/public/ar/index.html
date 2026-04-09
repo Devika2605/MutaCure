@@ -1,184 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Mol* Viewer</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/molstar@3.45.0/build/viewer/molstar.css"/>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { width:100%; height:100%; overflow:hidden; background:#080f09; }
-  #app { width:100%; height:100%; }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MutaCure AR — Protein Structures</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background:#0d1a0f;
+      font-family:'DM Mono','Fira Code',monospace;
+      color:#e8f0e8;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
 
-  /* ── Wild-type / Mutated banner (from Doc 4) ── */
-  #mode-banner {
-    position:absolute; top:10px; left:50%;
-    transform:translateX(-50%);
-    padding:5px 16px; border-radius:20px;
-    font-family:monospace; font-size:11px;
-    font-weight:600; letter-spacing:0.08em;
-    pointer-events:none; z-index:100;
-  }
-  .wildtype {
-    background:rgba(74,163,84,0.2);
-    border:1px solid rgba(74,163,84,0.5);
-    color:#6fcf7a;
-  }
-  .mutated {
-    background:rgba(224,92,92,0.2);
-    border:1px solid rgba(224,92,92,0.5);
-    color:#e05c5c;
-  }
+    .header {
+      text-align:center;
+      margin-bottom:28px;
+    }
+    .header-logo {
+      display:flex; align-items:center;
+      justify-content:center; gap:10px;
+      margin-bottom:8px;
+    }
+    .header-icon {
+      width:36px; height:36px; border-radius:10px;
+      background:rgba(74,163,84,0.15);
+      border:1px solid rgba(74,163,84,0.3);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .header-title {
+      font-family:'DM Sans',sans-serif;
+      font-size:20px; font-weight:700; color:#e8f0e8;
+    }
+    .header-title span { color:#6fcf7a; }
+    .header-sub {
+      font-size:11px;
+      color:rgba(232,240,232,0.35);
+      letter-spacing:0.05em;
+    }
 
-  /* ── Mutation info overlay (from Doc 3) ── */
-  #mut-info {
-    position:absolute; top:12px; left:12px;
-    background:rgba(224,92,92,0.12);
-    border:1px solid rgba(224,92,92,0.3);
-    border-radius:8px; padding:8px 12px;
-    font-family:monospace; font-size:11px;
-    color:#e8a0a0; max-width:260px; line-height:1.5;
-    pointer-events:none; z-index:100;
-  }
+    /* ── 2x2 Grid ── */
+    .grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      width:100%;
+      max-width:560px;
+    }
 
-  /* ── Dynamic legend (from Doc 4) ── */
-  #legend {
-    position:absolute; bottom:12px; left:12px;
-    background:rgba(13,26,15,0.9);
-    border:1px solid rgba(74,163,84,0.2);
-    border-radius:8px; padding:10px 14px;
-    font-family:monospace; font-size:11px;
-    color:rgba(232,240,232,0.8);
-    pointer-events:none; z-index:100;
-  }
-  #legend div { display:flex; align-items:center; gap:7px; margin-bottom:5px; }
-  #legend div:last-child { margin-bottom:0; }
-  .dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .cell {
+      position:relative;
+      background:#111d13;
+      border:1px solid rgba(74,163,84,0.15);
+      border-radius:12px;
+      overflow:hidden;
+      transition:border-color 0.2s;
+    }
+    .cell:hover {
+      border-color:rgba(74,163,84,0.4);
+    }
 
-  /* ── Status loader ── */
-  #status {
-    position:absolute; top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    color:#6fcf7a; font-family:monospace;
-    font-size:13px; text-align:center;
-    pointer-events:none; z-index:100;
-  }
-  @keyframes blink { 50%{opacity:0} }
-</style>
+    .cell img {
+      width:100%;
+      height:180px;
+      object-fit:cover;
+      display:block;
+      background:#f5f0e8;
+    }
+
+    .cell-info {
+      padding:10px 12px;
+      border-top:1px solid rgba(74,163,84,0.1);
+    }
+    .cell-protein {
+      font-size:14px;
+      font-weight:600;
+      color:#6fcf7a;
+      font-family:'DM Sans',sans-serif;
+      margin-bottom:2px;
+    }
+    .cell-disease {
+      font-size:10px;
+      color:rgba(232,240,232,0.4);
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+    }
+
+    /* Risk badge */
+    .cell-risk {
+      position:absolute;
+      top:8px; right:8px;
+      padding:3px 8px;
+      border-radius:20px;
+      font-size:10px;
+      font-family:monospace;
+      font-weight:600;
+    }
+    .risk-high {
+      background:rgba(224,92,92,0.2);
+      border:1px solid rgba(224,92,92,0.4);
+      color:#e05c5c;
+    }
+    .risk-med {
+      background:rgba(240,165,0,0.2);
+      border:1px solid rgba(240,165,0,0.4);
+      color:#f0a500;
+    }
+
+    /* Back link */
+    .back-link {
+      margin-top:24px;
+      font-size:11px;
+      color:rgba(232,240,232,0.3);
+      text-decoration:none;
+      transition:color 0.15s;
+    }
+    .back-link:hover { color:#6fcf7a; }
+  </style>
 </head>
 <body>
 
-<div id="app"></div>
-<div id="status">Loading structure<span style="animation:blink 1s step-start infinite;display:inline-block">...</span></div>
-<div id="mode-banner"></div>
-<div id="mut-info" style="display:none"></div>
-<div id="legend"></div>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="header-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="#6fcf7a" stroke-width="1.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <span class="header-title">MutaCure <span>AR</span></span>
+    </div>
+    <p class="header-sub">Therapeutic Protein Structures</p>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/molstar@3.45.0/build/viewer/molstar.js"></script>
-<script>
-window.addEventListener("load", async function() {
+  <!-- 2x2 Grid -->
+  <div class="grid">
 
-  var params     = new URLSearchParams(window.location.search);
-  var pdbUrl     = params.get("pdb") || "";
-  var mutPos     = parseInt(params.get("mut") || "0");   // 1-based residue number (Doc 3)
-  var mutInfo    = params.get("info") || "";
-  var isWildType = (mutInfo === "Wild+Type" || mutInfo === "Wild%20Type"
-                 || mutInfo === "Wild Type"  || mutInfo === "");
+    <div class="cell">
+      <img src="protein1.png" alt="PPARG"/>
+      <span class="cell-risk risk-high">0.87</span>
+      <div class="cell-info">
+        <div class="cell-protein">PPARG</div>
+        <div class="cell-disease">Type 2 Diabetes · TCF7L2</div>
+      </div>
+    </div>
 
-  // ── Mode banner (Doc 4) ──────────────────────────────────────
-  var banner = document.getElementById("mode-banner");
-  banner.textContent = isWildType ? "● WILD TYPE" : "● MUTATED";
-  banner.className   = isWildType ? "wildtype"    : "mutated";
+    <div class="cell">
+      <img src="protein2.png" alt="BRCA1"/>
+      <span class="cell-risk risk-high">0.79</span>
+      <div class="cell-info">
+        <div class="cell-protein">BRCA1</div>
+        <div class="cell-disease">Breast Cancer · BRCA1</div>
+      </div>
+    </div>
 
-  // ── Mutation info overlay (Doc 3) ───────────────────────────
-  if (mutInfo && !isWildType) {
-    var infoEl = document.getElementById("mut-info");
-    infoEl.textContent = "Mutation: " + decodeURIComponent(mutInfo);
-    infoEl.style.display = "block";
-  }
+    <div class="cell">
+      <img src="protein3.png" alt="EGFR"/>
+      <span class="cell-risk risk-med">0.74</span>
+      <div class="cell-info">
+        <div class="cell-protein">EGFR</div>
+        <div class="cell-disease">Lung Cancer · EGFR</div>
+      </div>
+    </div>
 
-  // ── Dynamic legend (Doc 4) ───────────────────────────────────
-  var legend = document.getElementById("legend");
-  if (isWildType) {
-    legend.innerHTML = `
-      <div><span class="dot" style="background:#4caf50"></span>Stable backbone</div>
-      <div><span class="dot" style="background:#2196f3"></span>Beta sheets</div>
-      <div><span class="dot" style="background:#ff9800"></span>Active site</div>`;
-  } else {
-    legend.innerHTML = `
-      <div><span class="dot" style="background:#e05c5c"></span>Mutation site</div>
-      <div><span class="dot" style="background:#f0a500"></span>Destabilized region</div>
-      <div><span class="dot" style="background:#9c27b0"></span>Disrupted binding</div>`;
-  }
+    <div class="cell">
+      <img src="protein4.png" alt="APOE"/>
+      <span class="cell-risk risk-med">0.62</span>
+      <div class="cell-info">
+        <div class="cell-protein">APOE</div>
+        <div class="cell-disease">Alzheimer's · APOE</div>
+      </div>
+    </div>
 
-  if (!pdbUrl) {
-    document.getElementById("status").textContent = "No PDB URL provided.";
-    return;
-  }
+  </div>
 
-  // ── Create viewer ────────────────────────────────────────────
-  try {
-    var viewer = await molstar.Viewer.create("app", {
-      layoutIsExpanded:          false,
-      layoutShowControls:        false,
-      layoutShowRemoteState:     false,
-      layoutShowSequence:        false,
-      layoutShowLog:             false,
-      layoutShowLeftPanel:       false,
-      viewportShowExpand:        false,
-      viewportShowSelectionMode: false,
-      viewportShowAnimation:     false,
-    });
+  <a href="/protein" class="back-link">← Back to Protein Explorer</a>
 
-    // ── Load structure ────────────────────────────────────────
-    await viewer.loadStructureFromUrl(pdbUrl, "pdb", false);
-    document.getElementById("status").style.display = "none";
-
-    // ── After load: apply color theme (Doc 4) + focus mutation (Doc 3) ──
-    setTimeout(async function() {
-
-      // Color theme based on mode
-      try {
-        var plugin = viewer.plugin;
-        var structures = plugin.managers.structure.hierarchy.current.structures;
-        if (structures && structures.length > 0) {
-          var components = structures[0].components;
-          if (components && components.length > 0) {
-            if (isWildType) {
-              await plugin.managers.structure.component.updateRepresentationsTheme(
-                components, { color: "sequence-id" }
-              );
-            } else {
-              await plugin.managers.structure.component.updateRepresentationsTheme(
-                components, { color: "hydrophobicity" }
-              );
-            }
-          }
-        }
-      } catch(e) {
-        console.log("Theme skipped:", e.message);
-      }
-
-      // Focus camera on mutation residue if provided (Doc 3)
-      if (mutPos > 0) {
-        try {
-          var Script = molstar.Script;
-          viewer.plugin.managers.structure.focus.setFromExpression(
-            Script.MolScript(`(sel.atom.res (= atom.auth_seq_id ${mutPos}))`)
-          );
-        } catch(e) {
-          console.log("Highlight skipped:", e.message);
-        }
-      }
-
-    }, 2500);
-
-  } catch(err) {
-    document.getElementById("status").textContent = "Error: " + err.message;
-    console.error(err);
-  }
-
-});
-</script>
 </body>
 </html>
