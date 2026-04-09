@@ -10,10 +10,7 @@ export default function ProteinPage() {
       <Head>
         <title>Protein Explorer — MutaCure AR</title>
         <meta name="description" content="3D protein structure prediction and AR visualization" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
+        
       </Head>
       <ProteinViewer />
     </>
