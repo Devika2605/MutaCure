@@ -1,8 +1,18 @@
---extra-index-url https://download.pytorch.org/whl/cpu
-torch
-transformers
-fastapi
-uvicorn
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+
+pydantic==2.6.4
+python-multipart==0.0.9
+
+requests==2.31.0
+aiofiles==23.2.1
+
+pandas==2.2.1
+numpy==1.26.4
+
+biopython==1.83
+
+scikit-learn==1.4.1.post1
+
+joblib 
 requests
-joblib
-scikit-learn
