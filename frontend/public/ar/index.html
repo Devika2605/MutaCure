@@ -8,12 +8,9 @@
   <!-- A-Frame & AR.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <!-- Three.js for custom protein geometry -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       background: #0d1a0f;
       font-family: 'DM Mono', 'Fira Code', monospace;
@@ -21,336 +18,181 @@
       overflow: hidden;
     }
 
-    /* ── Splash / instructions overlay ── */
+    /* ── feat/mutation: Splash screen ── */
     #splash {
-      position: fixed;
-      inset: 0;
-      background: #0d1a0f;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      gap: 32px;
+      position: fixed; inset: 0; background: #0d1a0f;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; z-index: 1000; gap: 32px;
       transition: opacity 0.5s ease;
     }
+    #splash.fade-out { opacity: 0; pointer-events: none; }
 
-    #splash.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .splash-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .splash-logo { display: flex; align-items: center; gap: 12px; }
     .splash-logo-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: rgba(74, 163, 84, 0.2);
-      border: 1px solid rgba(74, 163, 84, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(74,163,84,0.2); border: 1px solid rgba(74,163,84,0.4);
+      display: flex; align-items: center; justify-content: center;
     }
-
-    .splash-logo-text {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: #e8f0e8;
-    }
-
+    .splash-logo-text { font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 700; color: #e8f0e8; }
     .splash-logo-text span { color: #6fcf7a; }
 
     .splash-card {
-      background: #111d13;
-      border: 1px solid rgba(74, 163, 84, 0.2);
-      border-radius: 16px;
-      padding: 32px;
-      max-width: 420px;
-      width: 90%;
-      text-align: center;
+      background: #111d13; border: 1px solid rgba(74,163,84,0.2);
+      border-radius: 16px; padding: 32px; max-width: 420px; width: 90%; text-align: center;
     }
+    .splash-title { font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 600; color: #e8f0e8; margin-bottom: 8px; }
+    .splash-sub { font-size: 12px; color: rgba(232,240,232,0.45); margin-bottom: 24px; line-height: 1.6; }
 
-    .splash-title {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 20px;
-      font-weight: 600;
-      color: #e8f0e8;
-      margin-bottom: 8px;
-    }
-
-    .splash-sub {
-      font-size: 12px;
-      color: rgba(232, 240, 232, 0.45);
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
-
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 28px;
-      text-align: left;
-    }
-
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
+    .steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; text-align: left; }
+    .step { display: flex; align-items: flex-start; gap: 12px; }
     .step-num {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: rgba(74, 163, 84, 0.2);
-      border: 1px solid rgba(74, 163, 84, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      color: #6fcf7a;
-      flex-shrink: 0;
-      margin-top: 1px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(74,163,84,0.2); border: 1px solid rgba(74,163,84,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: #6fcf7a; flex-shrink: 0; margin-top: 1px;
     }
-
-    .step-text {
-      font-size: 12px;
-      color: rgba(232, 240, 232, 0.65);
-      line-height: 1.5;
-    }
+    .step-text { font-size: 12px; color: rgba(232,240,232,0.65); line-height: 1.5; }
 
     .splash-btn {
-      width: 100%;
-      padding: 14px;
-      background: #2d6a31;
-      border: none;
-      border-radius: 10px;
-      color: #e8f0e8;
-      font-size: 15px;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s;
+      width: 100%; padding: 14px; background: #2d6a31; border: none; border-radius: 10px;
+      color: #e8f0e8; font-size: 15px; font-family: 'DM Sans', sans-serif;
+      font-weight: 500; cursor: pointer; transition: background 0.15s;
     }
-
     .splash-btn:hover { background: #357a3a; }
 
-    /* ── AR HUD ── */
-    #hud {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 100;
-      display: none;
-    }
-
+    /* ── feat/mutation: AR HUD ── */
+    #hud { position: fixed; inset: 0; pointer-events: none; z-index: 100; display: none; }
     #hud.active { display: block; }
 
-    /* Top bar */
     #hud-top {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      position: absolute; top: 0; left: 0; right: 0; padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
       background: linear-gradient(to bottom, rgba(13,26,15,0.85) 0%, transparent 100%);
     }
-
-    .hud-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
+    .hud-brand { display: flex; align-items: center; gap: 10px; }
     .hud-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #6fcf7a;
-      box-shadow: 0 0 8px #6fcf7a;
-      animation: hudPulse 2s ease-in-out infinite;
+      width: 8px; height: 8px; border-radius: 50%; background: #6fcf7a;
+      box-shadow: 0 0 8px #6fcf7a; animation: hudPulse 2s ease-in-out infinite;
     }
+    @keyframes hudPulse { 0%,100%{opacity:1;box-shadow:0 0 8px #6fcf7a} 50%{opacity:.5;box-shadow:0 0 4px #6fcf7a} }
+    .hud-title { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #e8f0e8; }
+    .hud-status { font-size: 11px; color: rgba(232,240,232,0.5); font-family: 'DM Mono', monospace; }
 
-    @keyframes hudPulse {
-      0%, 100% { opacity: 1; box-shadow: 0 0 8px #6fcf7a; }
-      50% { opacity: 0.5; box-shadow: 0 0 4px #6fcf7a; }
-    }
-
-    .hud-title {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      color: #e8f0e8;
-    }
-
-    .hud-status {
-      font-size: 11px;
-      color: rgba(232, 240, 232, 0.5);
-      font-family: 'DM Mono', monospace;
-    }
-
-    /* Bottom info panel */
     #hud-bottom {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 20px;
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;
       background: linear-gradient(to top, rgba(13,26,15,0.9) 0%, transparent 100%);
     }
-
     .hud-info-card {
-      background: rgba(17, 29, 19, 0.88);
-      border: 1px solid rgba(74, 163, 84, 0.25);
-      border-radius: 14px;
-      padding: 16px 18px;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
+      background: rgba(17,29,19,0.88); border: 1px solid rgba(74,163,84,0.25);
+      border-radius: 14px; padding: 16px 18px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
       pointer-events: auto;
     }
-
     .hud-field { display: flex; flex-direction: column; gap: 4px; }
-
-    .hud-field-label {
-      font-size: 10px;
-      color: rgba(232, 240, 232, 0.35);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-    }
-
-    .hud-field-value {
-      font-size: 13px;
-      color: #e8f0e8;
-      font-weight: 500;
-    }
-
+    .hud-field-label { font-size: 10px; color: rgba(232,240,232,0.35); text-transform: uppercase; letter-spacing: 0.07em; }
+    .hud-field-value { font-size: 13px; color: #e8f0e8; font-weight: 500; }
     .hud-field-value.green { color: #6fcf7a; }
 
-    .hud-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
+    .hud-actions { display: flex; gap: 10px; margin-top: 14px; }
     .hud-btn {
-      flex: 1;
-      padding: 10px;
-      background: rgba(74, 163, 84, 0.12);
-      border: 1px solid rgba(74, 163, 84, 0.25);
-      border-radius: 8px;
-      color: #6fcf7a;
-      font-size: 12px;
-      font-family: 'DM Mono', monospace;
-      cursor: pointer;
-      transition: all 0.15s;
+      flex: 1; padding: 10px;
+      background: rgba(74,163,84,0.12); border: 1px solid rgba(74,163,84,0.25);
+      border-radius: 8px; color: #6fcf7a; font-size: 12px;
+      font-family: 'DM Mono', monospace; cursor: pointer; transition: all 0.15s;
     }
+    .hud-btn:hover { background: rgba(74,163,84,0.2); }
+    .hud-btn-back { background: rgba(232,240,232,0.06); border-color: rgba(232,240,232,0.12); color: rgba(232,240,232,0.6); }
 
-    .hud-btn:hover {
-      background: rgba(74, 163, 84, 0.2);
-    }
-
-    .hud-btn-back {
-      background: rgba(232, 240, 232, 0.06);
-      border-color: rgba(232, 240, 232, 0.12);
-      color: rgba(232, 240, 232, 0.6);
-    }
-
-    /* Scan target indicator */
+    /* ── feat/mutation: scan reticle ── */
     #scan-hint {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none; z-index: 100;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
       transition: opacity 0.4s;
     }
-
     #scan-hint.hidden { opacity: 0; }
-
-    .scan-reticle {
-      width: 180px;
-      height: 180px;
-      position: relative;
-    }
-
+    .scan-reticle { width: 180px; height: 180px; position: relative; }
     .scan-corner {
-      position: absolute;
-      width: 24px;
-      height: 24px;
-      border-color: #6fcf7a;
-      border-style: solid;
+      position: absolute; width: 24px; height: 24px;
+      border-color: #6fcf7a; border-style: solid;
       animation: scanPulse 1.5s ease-in-out infinite;
     }
-    .scan-corner.tl { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
-    .scan-corner.tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
-    .scan-corner.bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
-    .scan-corner.br { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
-
-    @keyframes scanPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
+    .scan-corner.tl { top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0; }
+    .scan-corner.tr { top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0; }
+    .scan-corner.bl { bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px; }
+    .scan-corner.br { bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0; }
+    @keyframes scanPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
     .scan-text {
-      font-size: 12px;
-      color: rgba(232, 240, 232, 0.6);
-      font-family: 'DM Mono', monospace;
-      background: rgba(13,26,15,0.75);
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid rgba(74, 163, 84, 0.2);
+      font-size: 12px; color: rgba(232,240,232,0.6);
+      background: rgba(13,26,15,0.75); padding: 6px 14px;
+      border-radius: 20px; border: 1px solid rgba(74,163,84,0.2);
     }
 
-    /* A-Frame canvas */
-    a-scene {
+    /* ── dev: compact info panel (top-left, shown in AR mode) ── */
+    #ui {
+      position: fixed; top: 12px; left: 12px; z-index: 999;
+      background: rgba(13,26,15,0.88); border: 1px solid rgba(74,163,84,0.35);
+      border-radius: 10px; padding: 10px 14px; color: #e8f0e8; max-width: 200px;
       display: none;
     }
+    #ui.active { display: block; }
+    #ui h2 { font-size: 13px; color: #6fcf7a; margin-bottom: 3px; }
+    #ui p  { font-size: 10px; color: rgba(232,240,232,0.5); line-height: 1.4; }
 
-    a-scene.active {
-      display: block;
+    /* ── dev: mutation badge ── */
+    #mut-badge {
+      position: fixed; top: 12px; right: 12px; z-index: 999;
+      background: rgba(224,92,92,0.15); border: 1px solid rgba(224,92,92,0.35);
+      border-radius: 8px; padding: 8px 12px;
+      color: #e8a0a0; font-size: 10px; max-width: 170px; line-height: 1.4;
+      display: none;
+    }
+    #mut-badge.active { display: block; }
+
+    /* ── dev: marker panel (on-screen marker for phone to scan) ── */
+    #marker-panel {
+      position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+      z-index: 999; background: rgba(13,26,15,0.92);
+      border: 1px solid rgba(74,163,84,0.3); border-radius: 12px;
+      padding: 10px; text-align: center; display: none;
+    }
+    #marker-panel p { font-size: 10px; color: #6fcf7a; margin-bottom: 6px; }
+    #marker-panel img { width: 120px; height: 120px; border-radius: 6px; }
+
+    /* ── dev: toggle marker button ── */
+    #toggle-marker {
+      position: fixed; bottom: 60px; right: 12px; z-index: 999;
+      background: rgba(13,26,15,0.92); border: 1px solid rgba(74,163,84,0.3);
+      border-radius: 8px; padding: 7px 12px;
+      color: #6fcf7a; font-size: 11px; cursor: pointer; display: none;
+    }
+    #toggle-marker.active { display: block; }
+
+    /* ── dev: gesture hint ── */
+    #gesture-hint {
+      position: fixed; bottom: 56px; left: 12px;
+      background: rgba(13,26,15,0.7); border-radius: 16px; padding: 5px 12px;
+      color: rgba(232,240,232,0.35); font-size: 10px; z-index: 999;
+      pointer-events: none; display: none;
     }
 
-    /* Back button (when in AR mode) */
+    /* ── feat/mutation: back button ── */
     #back-btn {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 200;
-      display: none;
-      padding: 8px 14px;
-      background: rgba(17,29,19,0.88);
-      border: 1px solid rgba(74, 163, 84, 0.25);
-      border-radius: 8px;
-      color: #6fcf7a;
-      font-size: 12px;
-      font-family: 'DM Mono', monospace;
-      cursor: pointer;
-      pointer-events: auto;
-      text-decoration: none;
+      position: fixed; top: 16px; left: 16px; z-index: 200; display: none;
+      padding: 8px 14px; background: rgba(17,29,19,0.88);
+      border: 1px solid rgba(74,163,84,0.25); border-radius: 8px;
+      color: #6fcf7a; font-size: 12px; font-family: 'DM Mono', monospace;
+      cursor: pointer; pointer-events: auto; text-decoration: none;
     }
-
     #back-btn.active { display: block; }
+
+    a-scene { display: none; }
+    a-scene.active { display: block; }
   </style>
 </head>
 <body>
 
-<!-- Splash screen -->
+<!-- ── feat/mutation: Splash screen ── -->
 <div id="splash">
   <div class="splash-logo">
     <div class="splash-logo-icon">
@@ -363,8 +205,7 @@
 
   <div class="splash-card">
     <h1 class="splash-title">AR Protein Visualizer</h1>
-    <p class="splash-sub">Point your camera at the printed marker to see the PPARG protein structure floating in augmented reality.</p>
-
+    <p class="splash-sub">Point your camera at the Hiro marker to see the protein structure floating in augmented reality.</p>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
@@ -383,19 +224,18 @@
         <div class="step-text">The protein structure will appear floating above the marker in 3D</div>
       </div>
     </div>
-
     <button class="splash-btn" id="startBtn">Launch AR Camera →</button>
   </div>
 
-  <a href="marker.png" download style="font-size:11px; color:rgba(232,240,232,0.35); text-decoration:none; margin-top:-16px;">
+  <a href="marker.png" download style="font-size:11px;color:rgba(232,240,232,0.35);text-decoration:none;margin-top:-16px;">
     ↓ Download Marker Image
   </a>
 </div>
 
-<!-- Back button -->
+<!-- ── feat/mutation: Back button ── -->
 <a href="/protein" id="back-btn">← Back</a>
 
-<!-- AR HUD -->
+<!-- ── feat/mutation: HUD ── -->
 <div id="hud">
   <div id="hud-top">
     <div class="hud-brand">
@@ -404,20 +244,19 @@
     </div>
     <span class="hud-status" id="markerStatus">Scanning for marker...</span>
   </div>
-
   <div id="hud-bottom">
     <div class="hud-info-card">
       <div class="hud-field">
         <span class="hud-field-label">Gene</span>
-        <span class="hud-field-value">TCF7L2</span>
+        <span class="hud-field-value" id="hud-gene">—</span>
       </div>
       <div class="hud-field">
         <span class="hud-field-label">Target</span>
-        <span class="hud-field-value green">PPARG</span>
+        <span class="hud-field-value green" id="hud-protein">—</span>
       </div>
       <div class="hud-field">
         <span class="hud-field-label">Affinity</span>
-        <span class="hud-field-value green">–9.3 kcal/mol</span>
+        <span class="hud-field-value green" id="hud-affinity">—</span>
       </div>
     </div>
     <div class="hud-actions">
@@ -429,7 +268,7 @@
   </div>
 </div>
 
-<!-- Scan reticle (shown while scanning) -->
+<!-- ── feat/mutation: Scan reticle ── -->
 <div id="scan-hint">
   <div class="scan-reticle">
     <div class="scan-corner tl"></div>
@@ -440,20 +279,27 @@
   <span class="scan-text">Point at marker to detect</span>
 </div>
 
-<!-- A-Frame AR Scene -->
+<!-- ── dev: compact info panel, mutation badge, marker panel, toggle, gesture hint ── -->
+<div id="ui">
+  <h2 id="protein-title">MutaCure AR</h2>
+  <p id="protein-sub">Point camera at marker</p>
+</div>
+<div id="mut-badge"></div>
+<div id="gesture-hint">Pinch to zoom · Drag to rotate</div>
+<div id="marker-panel">
+  <p>Point camera here</p>
+  <img src="https://jeromeetienne.github.io/AR.js/data/images/HIRO.jpg" alt="Hiro marker"/>
+</div>
+<button id="toggle-marker" onclick="toggleMarker()">Show Marker</button>
+
+<!-- ── A-Frame AR Scene ── -->
 <a-scene
   id="arScene"
   vr-mode-ui="enabled: false"
-  renderer="logarithmicDepthBuffer: true; precision: medium;"
+  renderer="logarithmicDepthBuffer: true; precision: medium; antialias: true;"
   embedded
   arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
 >
-  <!-- Assets -->
-  <a-assets>
-    <a-asset-item id="protein-model" src="/files/protein_current.pdb"></a-asset-item>
-  </a-assets>
-
-  <!-- Marker — uses Hiro pattern (standard, easy to print) -->
   <a-marker
     type="pattern"
     preset="hiro"
@@ -463,194 +309,259 @@
     smoothTolerance="0.01"
     smoothThreshold="5"
   >
-
-    <!-- Protein "blob" — animated sphere cluster mimicking protein surface -->
+    <!-- protein-root: glow ring sits here (dev) -->
     <a-entity id="protein-root" rotation="-90 0 0">
-
-      <!-- Central nucleus -->
-      <a-sphere
-        id="nucleus"
-        position="0 0 0"
-        radius="0.25"
-        color="#2d8c36"
-        opacity="0.85"
-        material="transparent: true; roughness: 0.4; metalness: 0.2;"
-        animation="property: scale; to: 1.08 1.08 1.08; dur: 2000; dir: alternate; loop: true; easing: easeInOutSine"
-      ></a-sphere>
-
-      <!-- Mutation site (red cluster) -->
-      <a-sphere
-        position="0.18 0.1 0.08"
-        radius="0.09"
-        color="#e05c5c"
-        material="roughness: 0.3; metalness: 0.3;"
-        animation="property: position; to: 0.19 0.12 0.09; dur: 1800; dir: alternate; loop: true; easing: easeInOutSine"
-      >
-        <!-- Mutation label -->
-        <a-text
-          value="Mutation Site\nArg325Trp"
-          position="0.15 0.08 0"
-          scale="0.3 0.3 0.3"
-          color="#ffcccc"
-          align="left"
-        ></a-text>
-      </a-sphere>
-
-      <!-- Binding pocket (blue) -->
-      <a-sphere
-        position="-0.15 0.08 0.12"
-        radius="0.07"
-        color="#5b9bd5"
-        material="roughness: 0.2; metalness: 0.4; transparent: true; opacity: 0.75;"
-        animation="property: scale; to: 1.15 1.15 1.15; dur: 1600; dir: alternate; loop: true; easing: easeInOutSine"
-      ></a-sphere>
-
-      <!-- Surface residue blobs -->
-      <a-sphere position="0.2 0 0.1" radius="0.06" color="#3aa844" opacity="0.7" material="transparent: true;"></a-sphere>
-      <a-sphere position="-0.2 0.05 -0.05" radius="0.07" color="#3aa844" opacity="0.65" material="transparent: true;"></a-sphere>
-      <a-sphere position="0.05 0.22 0.06" radius="0.06" color="#4caf50" opacity="0.7" material="transparent: true;"></a-sphere>
-      <a-sphere position="-0.08 -0.18 0.1" radius="0.065" color="#3aa844" opacity="0.6" material="transparent: true;"></a-sphere>
-      <a-sphere position="0.15 -0.12 -0.08" radius="0.055" color="#4caf50" opacity="0.65" material="transparent: true;"></a-sphere>
-      <a-sphere position="-0.18 -0.08 0.15" radius="0.06" color="#3aa844" opacity="0.7" material="transparent: true;"></a-sphere>
-      <a-sphere position="0.1 0.18 -0.12" radius="0.065" color="#4caf50" opacity="0.6" material="transparent: true;"></a-sphere>
-
-      <!-- Orbiting electron-like particles -->
-      <a-torus
-        position="0 0 0"
-        radius="0.38"
-        radius-tubular="0.008"
-        color="#6fcf7a"
-        opacity="0.3"
-        material="transparent: true;"
-        animation="property: rotation; to: 360 45 0; dur: 6000; loop: true; easing: linear"
-      ></a-torus>
-
-      <a-torus
-        position="0 0 0"
-        radius="0.45"
-        radius-tubular="0.006"
-        color="#4caf50"
-        opacity="0.2"
-        material="transparent: true;"
-        rotation="90 0 0"
-        animation="property: rotation; to: 90 360 0; dur: 9000; loop: true; easing: linear"
-      ></a-torus>
-
-      <!-- Floating label above protein -->
-      <a-entity position="0 0.55 0">
-        <a-plane
-          width="0.9"
-          height="0.22"
-          color="#111d13"
-          opacity="0.85"
-          material="transparent: true;"
-        ></a-plane>
-        <a-text
-          value="PPARG — MutaCure_001"
-          align="center"
-          position="0 0 0.01"
-          color="#6fcf7a"
-          scale="0.22 0.22 0.22"
-        ></a-text>
+      <!-- protein-pivot: the spinning model (dev) + feat/mutation static blobs -->
+      <a-entity id="protein-pivot" position="0 0 0">
+        <!-- dev: disease-driven spinner is injected here by JS -->
       </a-entity>
-
     </a-entity>
   </a-marker>
 
-  <!-- Camera -->
   <a-entity camera></a-entity>
 </a-scene>
 
 <script>
-  const API_BASE = window.location.protocol + "//" + window.location.hostname + ":8000";
+  // ── dev: MODELS map (disease → shape/color/label) ────────────
+  var MODELS = {
+    "Type 2 Diabetes":     { color:"#1D9E75", accent:"#5DCAA5", shape:"helix",  label:"PPARG / T2D",          desc:"Nuclear receptor — metabolic regulation",  gene:"TCF7L2", affinity:"-9.3 kcal/mol" },
+    "Breast Cancer":       { color:"#5b9bd5", accent:"#85B7EB", shape:"barrel", label:"BRCA1 / Breast Cancer", desc:"DNA repair tumor suppressor",              gene:"BRCA1",  affinity:"-8.1 kcal/mol" },
+    "Lung Cancer":         { color:"#EF9F27", accent:"#FAC775", shape:"kinase", label:"EGFR / Lung Cancer",    desc:"Receptor tyrosine kinase",                 gene:"EGFR",   affinity:"-7.8 kcal/mol" },
+    "Alzheimer's Disease": { color:"#9F77DD", accent:"#AFA9EC", shape:"bundle", label:"APOE / Alzheimers",     desc:"Lipid transport — APOE4 risk variant",     gene:"APOE",   affinity:"-8.6 kcal/mol" },
+  };
 
-  let arStarted = false;
-  let wireframeMode = false;
-  let zoomLevel = 1;
+  // ── Read URL params (disease, protein, mutation) ──────────────
+  var params  = new URLSearchParams(window.location.search);
+  var disease = params.get("disease") || "Type 2 Diabetes";
+  var protein = params.get("protein") || "PPARG";
+  var mut     = params.get("mut")     || "P115Q";
+  var risk    = params.get("risk")    || "0.87";
 
-  // Start AR
-  document.getElementById("startBtn").addEventListener("click", () => {
-    startAR();
-  });
+  var model = MODELS[disease] || MODELS["Type 2 Diabetes"];
+
+  // ── State ─────────────────────────────────────────────────────
+  var arStarted    = false;
+  var wireframeMode = false;
+  var zoomLevel    = 1;
+
+  // ── feat/mutation: start AR on splash button ──────────────────
+  document.getElementById("startBtn").addEventListener("click", startAR);
 
   function startAR() {
     if (arStarted) return;
     arStarted = true;
 
-    const splash = document.getElementById("splash");
+    var splash = document.getElementById("splash");
     splash.classList.add("fade-out");
-    setTimeout(() => { splash.style.display = "none"; }, 500);
+    setTimeout(function(){ splash.style.display = "none"; }, 500);
 
-    const scene = document.getElementById("arScene");
-    scene.classList.add("active");
-
+    document.getElementById("arScene").classList.add("active");
     document.getElementById("hud").classList.add("active");
     document.getElementById("back-btn").classList.add("active");
 
-    // Load current PDB if available
-    loadCurrentPDB();
+    // dev: show compact info panel, mutation badge, toggle button
+    document.getElementById("ui").classList.add("active");
+    document.getElementById("mut-badge").classList.add("active");
+    document.getElementById("toggle-marker").classList.add("active");
 
-    // Marker events
-    const marker = document.getElementById("marker");
-    marker.addEventListener("markerFound", () => {
+    // Populate HUD and info panel with model data
+    document.getElementById("hud-gene").textContent    = model.gene;
+    document.getElementById("hud-protein").textContent = protein;
+    document.getElementById("hud-affinity").textContent = model.affinity;
+    document.getElementById("protein-title").textContent = model.label;
+    document.getElementById("protein-sub").textContent   = model.desc;
+    document.getElementById("mut-badge").textContent     = "Mutation: " + mut + "  Risk: " + risk;
+
+    // Build the 3D protein model into the scene
+    buildProteinModel();
+
+    // Marker events — update both HUD status (feat) and dev status bar
+    var marker = document.getElementById("marker");
+    marker.addEventListener("markerFound", function() {
       document.getElementById("markerStatus").textContent = "Marker detected ✓";
       document.getElementById("scan-hint").classList.add("hidden");
+      document.getElementById("gesture-hint").style.display = "block";
+      document.getElementById("marker-panel").style.display = "none";
+      document.getElementById("toggle-marker").textContent = "Show Marker";
     });
-
-    marker.addEventListener("markerLost", () => {
+    marker.addEventListener("markerLost", function() {
       document.getElementById("markerStatus").textContent = "Scanning for marker...";
       document.getElementById("scan-hint").classList.remove("hidden");
+      document.getElementById("gesture-hint").style.display = "none";
     });
   }
 
-  // Try to fetch the latest PDB from the backend
-  async function loadCurrentPDB() {
-    try {
-      const res = await fetch(`${API_BASE}/api/generate-protein`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target_protein: "PPARG", max_length: 100 })
+  // ── dev: build disease-specific 3D model into a-scene ────────
+  function el(tag, attrs) {
+    var e = document.createElement(tag);
+    Object.keys(attrs).forEach(function(k){ e.setAttribute(k, attrs[k]); });
+    return e;
+  }
+
+  function buildProteinModel() {
+    var pivot = document.getElementById("protein-pivot");
+    var root  = document.getElementById("protein-root");
+
+    var spinner = document.createElement("a-entity");
+    spinner.id = "spinner";
+    spinner.setAttribute("animation__spin",
+      "property:rotation; from:0 0 0; to:0 360 0; loop:true; dur:9000; easing:linear");
+
+    if (model.shape === "helix") {
+      spinner.appendChild(el("a-cylinder", {position:"-0.15 0 0",    radius:"0.07", height:"0.7",  color:model.color,  rotation:"15 0 10",  material:"roughness:0.3;metalness:0.2"}));
+      spinner.appendChild(el("a-cylinder", {position:"0.15 0.1 0.1", radius:"0.06", height:"0.55", color:model.color,  rotation:"-10 20 5", material:"roughness:0.3;metalness:0.2"}));
+      spinner.appendChild(el("a-box",      {position:"0 0.2 -0.2",   width:"0.35",  height:"0.06", depth:"0.15", color:"#0F6E56", rotation:"5 -15 0"}));
+      spinner.appendChild(el("a-box",      {position:"0.1 -0.1 0.2", width:"0.3",   height:"0.06", depth:"0.12", color:"#0F6E56", rotation:"-5 10 0"}));
+      spinner.appendChild(el("a-torus",    {position:"-0.05 0.35 0", radius:"0.12", "radius-tubular":"0.02", color:model.accent, rotation:"45 0 30"}));
+      ["-0.2 -0.35 0","-0.1 -0.2 0.1","0 -0.05 0.15","0.1 0.1 0.1","0.15 0.25 0","0 0.38 -0.1"].forEach(function(p){
+        spinner.appendChild(el("a-sphere",{position:p, radius:"0.04", color:model.accent}));
       });
-      if (!res.ok) return;
-      const data = await res.json();
-      console.log("[MutaCure AR] PDB ready:", data.pdb_url);
-      // In a full implementation, we'd load the PDB into the A-Frame entity
-      // via a custom Three.js PDB loader here
-    } catch (e) {
-      console.warn("[MutaCure AR] Could not fetch PDB:", e.message);
+    } else if (model.shape === "barrel") {
+      for (var i = 0; i < 8; i++) {
+        var a = (i/8)*Math.PI*2, x = Math.cos(a)*0.28, z = Math.sin(a)*0.28;
+        spinner.appendChild(el("a-cylinder",{position:x+" 0 "+z, radius:"0.045", height:"0.75", color:model.color}));
+      }
+      spinner.appendChild(el("a-sphere",{position:"0 0 0", radius:"0.12", color:model.accent}));
+      spinner.appendChild(el("a-box",{position:"0 0.42 0",  width:"0.6", height:"0.06", depth:"0.6", color:"#0C447C"}));
+      spinner.appendChild(el("a-box",{position:"0 -0.42 0", width:"0.6", height:"0.06", depth:"0.6", color:"#0C447C"}));
+    } else if (model.shape === "kinase") {
+      spinner.appendChild(el("a-cylinder",{position:"0 0.15 0",  radius:"0.22", height:"0.45", color:model.color}));
+      spinner.appendChild(el("a-cylinder",{position:"0 -0.2 0",  radius:"0.18", height:"0.35", color:"#BA7517"}));
+      spinner.appendChild(el("a-box",     {position:"0 -0.02 0", width:"0.45",  height:"0.06", depth:"0.3",  color:"#633806"}));
+      spinner.appendChild(el("a-torus",   {position:"0 0 0",     radius:"0.32", "radius-tubular":"0.02", color:model.accent, rotation:"90 0 0"}));
+      spinner.appendChild(el("a-sphere",  {position:"0.15 0 0.1",radius:"0.07", color:model.accent}));
+    } else if (model.shape === "bundle") {
+      [["-0.15 0 -0.15","0 0 -8"],["0.15 0 -0.15","0 0 8"],["0.15 0 0.15","0 0 -8"],["-0.15 0 0.15","0 0 8"]].forEach(function(d){
+        spinner.appendChild(el("a-cylinder",{position:d[0], radius:"0.055", height:"0.7", color:model.color, rotation:d[1]}));
+      });
+      spinner.appendChild(el("a-torus",{position:"0 0.35 0",  radius:"0.18","radius-tubular":"0.02",color:model.accent}));
+      spinner.appendChild(el("a-torus",{position:"0 -0.35 0", radius:"0.18","radius-tubular":"0.02",color:model.accent}));
+      spinner.appendChild(el("a-sphere",{position:"0 0 0", radius:"0.08", color:model.accent}));
     }
+
+    // Mutation site (feat/mutation red sphere + dev label)
+    var mutSite = el("a-sphere",{
+      position:"-0.15 0.2 0.05", radius:"0.1", color:"#e05c5c",
+      material:"roughness:0.2;metalness:0.3;emissive:#440000;emissiveIntensity:0.5",
+      animation:"property:scale; from:1 1 1; to:1.5 1.5 1.5; loop:true; dur:800; direction:alternate; easing:easeInOutSine"
+    });
+    spinner.appendChild(mutSite);
+    spinner.appendChild(el("a-text",{value:"Mutation Site\n"+mut, position:"-0.15 0.44 0.05", align:"center", color:"#ffcccc", width:"1.2"}));
+
+    pivot.appendChild(spinner);
+
+    // Floating protein label (feat/mutation style)
+    var titleWrap = document.createElement("a-entity");
+    titleWrap.setAttribute("position","0 0.55 0");
+    titleWrap.setAttribute("animation","property:position; from:0 0.55 0; to:0 0.65 0; loop:true; dur:2500; direction:alternate; easing:easeInOutSine");
+    var labelPlane = el("a-plane",{width:"0.9", height:"0.22", color:"#111d13", opacity:"0.85", material:"transparent:true"});
+    var labelText  = el("a-text", {value:protein+" — MutaCure_001", align:"center", position:"0 0 0.01", color:"#6fcf7a", scale:"0.22 0.22 0.22"});
+    titleWrap.appendChild(labelPlane);
+    titleWrap.appendChild(labelText);
+    pivot.appendChild(titleWrap);
+
+    // Binding pocket (feat/mutation blue sphere)
+    pivot.appendChild(el("a-sphere",{position:"0.05 -0.05 0", radius:"0.22", color:"#5b9bd5", material:"opacity:0.12;transparent:true"}));
+
+    // Orbiting torus rings (feat/mutation)
+    pivot.appendChild(el("a-torus",{
+      position:"0 0 0", radius:"0.38", "radius-tubular":"0.008",
+      color:"#6fcf7a", opacity:"0.3", material:"transparent:true",
+      animation:"property:rotation; to:360 45 0; dur:6000; loop:true; easing:linear"
+    }));
+    pivot.appendChild(el("a-torus",{
+      position:"0 0 0", radius:"0.45", "radius-tubular":"0.006",
+      color:"#4caf50", opacity:"0.2", material:"transparent:true", rotation:"90 0 0",
+      animation:"property:rotation; from:90 0 0; to:90 360 0; dur:9000; loop:true; easing:linear"
+    }));
+
+    // Glow ring at ground level (dev)
+    var ring = el("a-torus",{
+      position:"0 0.01 0", rotation:"-90 0 0", radius:"0.7", "radius-tubular":"0.015",
+      color:model.color, material:"opacity:0.5;transparent:true",
+      animation:"property:rotation; from:-90 0 0; to:-90 360 0; loop:true; dur:10000; easing:linear"
+    });
+    root.appendChild(ring);
   }
 
-  // HUD controls
+  // ── feat/mutation: HUD controls ───────────────────────────────
   function rotateProtein() {
-    const root = document.getElementById("protein-root");
-    if (!root) return;
-    const current = root.getAttribute("rotation") || { x: -90, y: 0, z: 0 };
-    root.setAttribute("rotation", {
-      x: current.x,
-      y: (current.y || 0) + 45,
-      z: current.z
-    });
+    var spinner = document.getElementById("spinner");
+    if (!spinner) return;
+    var cur = spinner.getAttribute("rotation") || {x:0,y:0,z:0};
+    spinner.setAttribute("rotation",{x:cur.x, y:(cur.y||0)+45, z:cur.z});
   }
 
   function toggleWireframe() {
     wireframeMode = !wireframeMode;
-    const nucleus = document.getElementById("nucleus");
-    if (nucleus) {
-      nucleus.setAttribute("material", {
-        wireframe: wireframeMode,
-        color: "#6fcf7a"
+    var spinner = document.getElementById("spinner");
+    if (spinner) {
+      var spheres = spinner.querySelectorAll("a-sphere");
+      spheres.forEach(function(s){
+        s.setAttribute("material", "wireframe:" + wireframeMode);
       });
     }
   }
 
   function zoomIn() {
     zoomLevel = zoomLevel >= 2 ? 1 : zoomLevel + 0.25;
-    const root = document.getElementById("protein-root");
-    if (root) {
-      root.setAttribute("scale", `${zoomLevel} ${zoomLevel} ${zoomLevel}`);
+    var pivot = document.getElementById("protein-pivot");
+    if (pivot) pivot.setAttribute("scale", zoomLevel+" "+zoomLevel+" "+zoomLevel);
+  }
+
+  // ── dev: toggle on-screen marker panel ───────────────────────
+  function toggleMarker() {
+    var panel = document.getElementById("marker-panel");
+    var btn   = document.getElementById("toggle-marker");
+    if (panel.style.display === "none" || panel.style.display === "") {
+      panel.style.display = "block";
+      btn.textContent = "Hide Marker";
+    } else {
+      panel.style.display = "none";
+      btn.textContent = "Show Marker";
     }
   }
+
+  // ── dev: touch gestures (pinch-zoom + drag-rotate) ───────────
+  var scale = 1.0, rotY = 0, lastDist = null, lastX = null;
+  document.getElementById("arScene").addEventListener("loaded", function() {
+    var canvas = document.querySelector("canvas") || document.body;
+
+    canvas.addEventListener("touchstart", function(e) {
+      if (e.touches.length === 2)
+        lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      else if (e.touches.length === 1)
+        lastX = e.touches[0].clientX;
+    },{passive:true});
+
+    canvas.addEventListener("touchmove", function(e) {
+      if (e.touches.length === 2) {
+        var d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        if (lastDist) {
+          scale = Math.max(0.4, Math.min(3.0, scale + (d - lastDist) * 0.005));
+          var pivot = document.getElementById("protein-pivot");
+          if (pivot) pivot.setAttribute("scale", scale+" "+scale+" "+scale);
+        }
+        lastDist = d;
+      } else if (e.touches.length === 1 && lastX !== null) {
+        rotY += (e.touches[0].clientX - lastX) * 0.5;
+        var spinner = document.getElementById("spinner");
+        if (spinner) {
+          spinner.removeAttribute("animation__spin");
+          spinner.setAttribute("rotation","0 "+rotY+" 0");
+        }
+        lastX = e.touches[0].clientX;
+        clearTimeout(window._spinTimer);
+        window._spinTimer = setTimeout(function(){
+          var sp = document.getElementById("spinner");
+          if (sp) sp.setAttribute("animation__spin",
+            "property:rotation; from:0 "+rotY+" 0; to:0 "+(rotY+360)+" 0; loop:true; dur:9000; easing:linear");
+        }, 2000);
+      }
+    },{passive:true});
+
+    canvas.addEventListener("touchend", function(){ lastDist = null; lastX = null; },{passive:true});
+  });
 </script>
 
 </body>
