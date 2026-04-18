@@ -1,8 +1,6 @@
-// pages/protein.jsx  (or app/protein/page.jsx for App Router)
-// Person 2's route — /protein
+// pages/protein.jsx
 import Head from "next/head";
 import ProteinViewer from "../components/protein/ProteinViewer";
-<script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js" />
 
 export default function ProteinPage() {
   return (
@@ -10,7 +8,6 @@ export default function ProteinPage() {
       <Head>
         <title>Protein Explorer — MutaCure AR</title>
         <meta name="description" content="3D protein structure prediction and AR visualization" />
-        
       </Head>
       <ProteinViewer />
     </>
