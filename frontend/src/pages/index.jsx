@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import Layout from "../components/Layout";
+import { useUser } from "../context/UserContext";
 
 const Icon = ({ n, s = 16, c = "currentColor" }) => {
   const st = { width: s, height: s, flexShrink: 0 };
@@ -89,6 +90,7 @@ const PIPELINE_STEPS = [
 
 export default function Dashboard() {
   const router = useRouter();
+  const { user } = useUser();
   const fileInputRef = useRef(null);
 
   // File upload state
@@ -160,7 +162,7 @@ export default function Dashboard() {
             <div style={{ background:"#fff", borderRadius:16, border:"1px solid #e6ebe6", overflow:"hidden", display:"grid", gridTemplateColumns:"1fr 480px", minHeight:220 }}>
               <div style={{ padding:"32px 36px", display:"flex", flexDirection:"column", justifyContent:"center" }}>
                 <p style={{ fontSize:14, color:"#5a7a5a", margin:"0 0 4px", fontFamily:"'DM Sans',sans-serif" }}>
-                  Welcome Back, <strong style={{ color:"#1a2e1a" }}>Dr. Santos</strong>
+                  Welcome Back, <strong style={{ color:"#1a2e1a" }}>{user.name}</strong>
                 </p>
                 <h2 style={{ fontSize:36, fontWeight:800, color:"#1a2e1a", margin:"0 0 10px", letterSpacing:"-0.025em", lineHeight:1.05, fontFamily:"'DM Sans',sans-serif" }}>
                   MutaCure AR

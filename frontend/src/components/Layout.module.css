@@ -18,7 +18,6 @@
   overflow: hidden;
 }
 
-/* DNA helix background — dark green gradient with faint helix art */
 .sidebarBg {
   position: absolute;
   inset: 0;
@@ -26,16 +25,15 @@
   z-index: 0;
 }
 
-/* Helix pattern via pseudo — a repeating SVG-style radial gradient */
 .sidebarBg::after {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(ellipse 60px 120px at 30% 25%, rgba(74,163,84,0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 60px 120px at 70% 55%, rgba(74,163,84,0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 40px 80px at 25% 70%, rgba(74,163,84,0.05) 0%, transparent 70%),
-    radial-gradient(ellipse 50px 100px at 75% 85%, rgba(74,163,84,0.07) 0%, transparent 70%);
+    radial-gradient(ellipse 80px 180px at 30% 20%, rgba(74,163,84,0.09) 0%, transparent 70%),
+    radial-gradient(ellipse 60px 140px at 70% 50%, rgba(74,163,84,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50px 120px at 25% 75%, rgba(74,163,84,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 70px 160px at 80% 88%, rgba(74,163,84,0.08) 0%, transparent 70%);
   z-index: 0;
 }
 
@@ -45,18 +43,16 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0;
 }
 
-/* Logo */
 .logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 20px 20px 16px;
+  padding: 20px 18px 16px;
   cursor: pointer;
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .logoMark {
@@ -65,7 +61,7 @@
   background: linear-gradient(135deg, #2d7a31, #4caf50);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(74,163,84,0.3);
+  box-shadow: 0 2px 8px rgba(74,163,84,0.28);
 }
 
 .logoText {
@@ -73,26 +69,26 @@
   font-weight: 500;
   color: rgba(255,255,255,0.9);
   letter-spacing: -0.01em;
+  line-height: 1.2;
 }
-.logoText strong { font-weight: 700; }
+.logoText strong { font-weight: 800; }
 
-/* Nav */
 .nav {
   flex: 1;
-  padding: 4px 12px;
+  padding: 4px 10px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   overflow-y: auto;
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: 11px;
+  padding: 10px 11px;
   border-radius: 10px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.48);
   font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
@@ -108,29 +104,26 @@
   color: rgba(255,255,255,0.85);
 }
 .navActive {
-  background: rgba(74,163,84,0.25) !important;
+  background: rgba(74,163,84,0.22) !important;
   color: #fff !important;
   font-weight: 600;
 }
-.navActive svg { opacity: 1; }
 
 .navBottom {
-  padding: 8px 12px 20px;
+  padding: 6px 10px 18px;
   border-top: 1px solid rgba(255,255,255,0.06);
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
-/* ── Main area ── */
+/* ── Main ── */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
-  background: #f4f6f4;
 }
 
-/* Topbar */
 .topbar {
   display: flex;
   align-items: center;
@@ -170,35 +163,123 @@
 
 .bellBadge {
   position: absolute;
-  top: 7px; right: 7px;
+  top: 8px; right: 8px;
   width: 7px; height: 7px;
   background: #e05c5c;
   border-radius: 50%;
   border: 1.5px solid #fff;
 }
 
-.avatarRow {
+/* ── Avatar trigger ── */
+.avatarTrigger {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px 0;
 }
 
-.avatar {
+.avatarCircle {
   width: 34px; height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2d7a31, #4caf50);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+}
+
+.avatarInfo {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
 }
 
 .avatarName {
   font-size: 13.5px;
   font-weight: 600;
   color: #2a3a2a;
+  line-height: 1.2;
+  font-family: 'DM Sans', sans-serif;
 }
 
-/* Scrollable page content */
+.avatarRole {
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.2;
+}
+
+/* ── Dropdown ── */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 270px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e6ebe6;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropIn 0.15s ease;
+}
+
+.dropHeader {
+  padding: 18px 18px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-bottom: 1px solid #f0f5f0;
+}
+
+.dropAvatar {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.dropName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a2e1a;
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 2px;
+}
+
+.dropEmail {
+  font-size: 11px;
+  color: #8aaa8a;
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 8px;
+}
+
+.dropBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.dropSection {
+  padding: 6px 8px;
+}
+
+.dropSectionLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: #9aaa9a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 8px;
+  margin-bottom: 8px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── Content ── */
 .content {
   flex: 1;
   overflow-y: auto;
@@ -210,11 +291,12 @@
 
 @media (max-width: 768px) {
   .shell { flex-direction: column; }
-  .sidebar { width: 100%; height: 60px; min-width: unset; }
-  .sidebarInner { flex-direction: row; padding: 0 12px; }
-  .logo { border-bottom: none; margin: 0; padding: 12px 8px; }
-  .nav { flex-direction: row; padding: 0; overflow-x: auto; }
+  .sidebar { width: 100%; height: auto; min-width: unset; }
+  .sidebarInner { flex-direction: row; align-items: center; padding: 0 12px; height: 58px; }
+  .logo { border: none; margin: 0; padding: 10px 8px; }
+  .nav { flex-direction: row; padding: 0; overflow-x: auto; flex: 1; }
   .navBottom { display: none; }
-  .navItem { white-space: nowrap; }
+  .navItem { white-space: nowrap; flex-shrink: 0; }
   .content { padding: 16px; }
+  .dropdown { right: -60px; }
 }
