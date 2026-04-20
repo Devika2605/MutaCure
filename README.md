@@ -2,8 +2,6 @@
 
 **AI-Powered Mutation-to-Therapy Platform with Augmented Reality Visualization**
 
-> Runner-Up · National Level Hackathon · CIT College, Tumkur · April 2025
-
 ---
 
 ## 📌 What is MutaCure AR?
