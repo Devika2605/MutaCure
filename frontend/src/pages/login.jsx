@@ -1,4 +1,4 @@
-// pages/login.jsx — Login / Register page
+// pages/login.jsx
 import Head from "next/head";
 import { useState } from "react";
 import { useRouter } from "next/router";
@@ -8,28 +8,52 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, register } = useAuth();
 
-  const [mode,     setMode]     = useState("login");   // "login" | "register"
-  const [role,     setRole]     = useState("clinician"); // "clinician" | "patient"
+  const [mode,     setMode]     = useState("login");
+  const [role,     setRole]     = useState("clinician");
   const [name,     setName]     = useState("");
   const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
   const [error,    setError]    = useState(null);
   const [loading,  setLoading]  = useState(false);
 
+  const fillDemo = (type) => {
+    if (type === "clinician") {
+      setEmail("doctor@mutacure.ai");
+      setPassword("doctor123");
+      setRole("clinician");
+      setMode("login");
+    } else {
+      setEmail("patient@mutacure.ai");
+      setPassword("patient123");
+      setRole("patient");
+      setMode("login");
+    }
+    setError(null);
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
+    const trimmedEmail    = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
+    console.log("[Auth] Attempting login:", { email: trimmedEmail, mode, role });
+
     try {
       if (mode === "login") {
-        const data = await login(email, password);
-        router.push(data.role === "patient" ? "/patient" : "/");
+        const data = await login(trimmedEmail, trimmedPassword);
+        console.log("[Auth] Login success:", data);
+        router.push(data.role === "patient" ? "/patient" : "/dashboard");
       } else {
         if (!name.trim()) { setError("Name is required"); setLoading(false); return; }
-        const data = await register(name, email, password, role);
-        router.push(data.role === "patient" ? "/patient" : "/");
+        const data = await register(name.trim(), trimmedEmail, trimmedPassword, role);
+        console.log("[Auth] Register success:", data);
+        router.push(data.role === "patient" ? "/patient" : "/dashboard");
       }
     } catch (err) {
+      console.error("[Auth] Error:", err.message);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -40,8 +64,6 @@ export default function LoginPage() {
     <>
       <Head><title>Sign In — MutaCure AR</title></Head>
       <div style={{ minHeight:"100vh", background:"linear-gradient(135deg,#0f2212 0%,#1b3a20 50%,#142d18 100%)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'DM Sans',sans-serif", padding:20 }}>
-
-        {/* Background glow */}
         <div style={{ position:"fixed", inset:0, background:"radial-gradient(ellipse 600px 400px at 50% 40%, rgba(74,163,84,0.08) 0%, transparent 70%)", pointerEvents:"none" }} />
 
         <div style={{ width:"100%", maxWidth:440, position:"relative", zIndex:1 }}>
@@ -66,7 +88,7 @@ export default function LoginPage() {
             {/* Mode toggle */}
             <div style={{ display:"flex", background:"#f0f5f0", borderRadius:10, padding:3, marginBottom:28 }}>
               {["login","register"].map(m => (
-                <button key={m} onClick={() => { setMode(m); setError(null); }}
+                <button key={m} type="button" onClick={() => { setMode(m); setError(null); }}
                   style={{ flex:1, padding:"9px 0", borderRadius:8, border:"none", cursor:"pointer", fontSize:13, fontWeight:600, transition:"all 0.15s", background:mode===m?"#2d6a31":"transparent", color:mode===m?"#fff":"#6a8a6a" }}>
                   {m === "login" ? "Sign In" : "Register"}
                 </button>
@@ -75,7 +97,7 @@ export default function LoginPage() {
 
             <form onSubmit={submit} style={{ display:"flex", flexDirection:"column", gap:16 }}>
 
-              {/* Role selector (always visible) */}
+              {/* Role selector */}
               <div>
                 <label style={labelStyle}>I am a</label>
                 <div style={{ display:"flex", gap:10 }}>
@@ -96,7 +118,8 @@ export default function LoginPage() {
               {mode === "register" && (
                 <div>
                   <label style={labelStyle}>Full Name</label>
-                  <input value={name} onChange={e=>setName(e.target.value)} placeholder={role==="clinician"?"Dr. Santos":"Alex Johnson"}
+                  <input value={name} onChange={e => setName(e.target.value)}
+                    placeholder={role === "clinician" ? "Dr. Santos" : "Alex Johnson"}
                     style={inputStyle} required />
                 </div>
               )}
@@ -104,24 +127,32 @@ export default function LoginPage() {
               {/* Email */}
               <div>
                 <label style={labelStyle}>Email</label>
-                <input type="email" value={email} onChange={e=>setEmail(e.target.value)}
-                  placeholder={role==="clinician"?"doctor@hospital.com":"patient@email.com"}
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  placeholder={role === "clinician" ? "doctor@hospital.com" : "patient@email.com"}
                   style={inputStyle} required />
               </div>
 
               {/* Password */}
               <div>
                 <label style={labelStyle}>Password</label>
-                <input type="password" value={password} onChange={e=>setPassword(e.target.value)}
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••" style={inputStyle} required />
               </div>
 
-              {/* Demo hint */}
+              {/* Demo quick-fill buttons */}
               {mode === "login" && (
-                <div style={{ background:"#f8faf8", border:"1px solid #e0ede0", borderRadius:8, padding:"10px 12px", fontSize:11, color:"#5a7a5a", fontFamily:"'DM Mono',monospace", lineHeight:1.7 }}>
-                  <strong style={{ color:"#2d7a31" }}>Demo accounts:</strong><br/>
-                  🔬 doctor@mutacure.ai / doctor123<br/>
-                  👤 patient@mutacure.ai / patient123
+                <div style={{ background:"#f8faf8", border:"1px solid #e0ede0", borderRadius:8, padding:"10px 12px" }}>
+                  <div style={{ fontSize:11, color:"#5a7a5a", fontFamily:"'DM Mono',monospace", marginBottom:8, fontWeight:600 }}>Quick demo login:</div>
+                  <div style={{ display:"flex", gap:8 }}>
+                    <button type="button" onClick={() => fillDemo("clinician")}
+                      style={{ flex:1, padding:"7px 10px", borderRadius:7, border:"1px solid #c8e6c9", background:"#f0faf0", color:"#2d7a31", fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
+                      🔬 Clinician
+                    </button>
+                    <button type="button" onClick={() => fillDemo("patient")}
+                      style={{ flex:1, padding:"7px 10px", borderRadius:7, border:"1px solid #c8daf0", background:"#f0f4ff", color:"#3a5a9a", fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
+                      👤 Patient
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -135,13 +166,13 @@ export default function LoginPage() {
               {/* Submit */}
               <button type="submit" disabled={loading}
                 style={{ padding:"13px", borderRadius:10, border:"none", background:loading?"#9aba9a":"#2d6a31", color:"#fff", fontSize:14, fontWeight:700, cursor:loading?"not-allowed":"pointer", marginTop:4, transition:"background 0.15s" }}>
-                {loading ? "Please wait..." : mode === "login" ? `Sign In as ${role === "clinician" ? "Clinician" : "Patient"}` : "Create Account"}
+                {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
               </button>
 
             </form>
           </div>
 
-          <p style={{ textAlign:"center", marginTop:20, fontSize:12, color:"rgba(255,255,255,0.35)" }}>
+          <p style={{ textAlign:"center", marginTop:20, fontSize:12, color:"rgba(255,255,255,0.3)" }}>
             MutaCure AR · Secure genomic analysis platform
           </p>
         </div>

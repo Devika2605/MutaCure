@@ -5,7 +5,7 @@ import styles from "./Layout.module.css";
 import { useAuth } from "../context/AuthContext";
 
 const CLINICIAN_NAV = [
-  { path: "/",         label: "Dashboard",        icon: "grid"    },
+  { path: "/dashboard", label: "Dashboard",        icon: "grid"    },
   { path: "/mutation", label: "Mutation Analysis", icon: "dna"     },
   { path: "/protein",  label: "Protein Explorer",  icon: "atom"    },
   { path: "/ar",       label: "AR Viewer",         icon: "ar"      },
@@ -80,7 +80,7 @@ export default function Layout({ children, pageTitle = "Home" }) {
         <div className={styles.sidebarBg} />
         <div className={styles.sidebarInner}>
 
-          <div className={styles.logo} onClick={() => router.push(isPatient ? "/patient" : "/")}>
+          <div className={styles.logo} onClick={() => router.push(isPatient ? "/patient" : "/dashboard")}>
             <div className={styles.logoMark}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
