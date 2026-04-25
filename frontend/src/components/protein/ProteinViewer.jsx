@@ -111,23 +111,27 @@ export default function ProteinViewer() {
 
   const molRef = useRef(null);
   const autoTriggered = useRef(false);
+  const selectedDiseaseRef = useRef(selectedDisease);
+
+  useEffect(() => { selectedDiseaseRef.current = selectedDisease; }, [selectedDisease]);
 
   const addLog = (msg) => setLog(prev => [...prev, { time: Date.now(), msg }]);
 
-  const generateProtein = useCallback(async () => {
+  const generateProtein = useCallback(async (diseaseOverride) => {
+    const disease = diseaseOverride || selectedDiseaseRef.current;
     setPhase("generating");
     setError(null);
     setResult(null);
     setLog([]);
     setViewMode("wildtype");
     setAffinityScore(null);
-    addLog(`Fetching sequence for target: ${selectedDisease.target}`);
+    addLog(`Fetching sequence for target: ${disease.target}`);
 
     try {
       const res = await fetch(`${API_BASE}/api/generate-protein`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target_protein: selectedDisease.target, max_length: 200, apply_mutation: true }),
+        body: JSON.stringify({ target_protein: disease.target, max_length: 200, apply_mutation: true }),
       });
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
@@ -142,17 +146,24 @@ export default function ProteinViewer() {
       setPhase("error");
       addLog(`Error: ${err.message}`);
     }
-  }, [selectedDisease]);
+  }, []); // stable — reads from ref
 
+  // Auto-trigger from URL params — runs once on mount only
   useEffect(() => {
-    const { target } = getUrlParams();
+    const { target, gene, variant, risk } = getUrlParams();
     if (!target || autoTriggered.current) return;
     autoTriggered.current = true;
-    const d = DISEASE_OPTIONS.find(d => d.target === target);
-    if (d) setSelectedDisease(d);
-    const t = setTimeout(() => generateProtein(), 300);
-    return () => clearTimeout(t);
-  }, [generateProtein]);
+    const d = DISEASE_OPTIONS.find(d => d.target === target || d.gene === gene)
+      || (gene && target
+        ? { label:`${gene} (Custom)`, gene, variant: variant||"Unknown", target, risk: parseFloat(risk)||0.5, impact:"" }
+        : null);
+    if (d) {
+      setSelectedDisease(d);
+      selectedDiseaseRef.current = d;
+      const t = setTimeout(() => generateProtein(d), 100);
+      return () => clearTimeout(t);
+    }
+  }, []); // empty deps — runs once on mount only
 
   useEffect(() => {
     if (phase !== "done" || !result || !result.pdb_url || !molRef.current) return;
